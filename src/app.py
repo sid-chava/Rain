@@ -13,12 +13,15 @@ from typing import List, TypedDict
 from langgraph.graph import START, StateGraph
 from langchain import hub
 
-# Load environment variables
-load_dotenv()
+# Set environment variables from Streamlit secrets
+os.environ["OPENAI_API_KEY"] = st.secrets["api_keys"]["OPENAI_API_KEY"]
+os.environ["SUPABASE_URL"] = st.secrets["supabase"]["SUPABASE_URL"]
+os.environ["SUPABASE_SERVICE_KEY"] = st.secrets["supabase"]["SUPABASE_SERVICE_KEY"]
+
 
 # Initialize Supabase client
-supabase_url = os.getenv("SUPABASE_URL")
-supabase_key = os.getenv("SUPABASE_SERVICE_KEY")
+supabase_url = st.secrets["supabase"]["SUPABASE_URL"]
+supabase_key = st.secrets["supabase"]["SUPABASE_SERVICE_KEY"]
 supabase_client = create_client(supabase_url, supabase_key)
 
 # Initialize LLM and embeddings
