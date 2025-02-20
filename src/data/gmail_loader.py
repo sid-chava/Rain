@@ -45,6 +45,7 @@ class GmailLoader:
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
                     self.credentials_path, SCOPES)
+                print("Starting OAuth flow on port 8080")
                 self.creds = flow.run_local_server(port=8080)
             # Save the credentials for the next run
             with open('token.json', 'w') as token:
