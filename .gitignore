@@ -2,3 +2,4 @@
 # Streamlit secrets
 .streamlit/secrets.toml
 notebooks/token.json
+credentials.json
