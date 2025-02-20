@@ -7,11 +7,6 @@ from datetime import datetime
 from typing import List, Optional
 
 from dotenv import load_dotenv
-from langchain_community.document_loaders import (
-    WebBaseLoader,
-    UnstructuredEmailLoader,
-    DirectoryLoader
-)
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import SupabaseVectorStore
 from langchain_openai import OpenAIEmbeddings
@@ -72,28 +67,12 @@ class DataIngestionPipeline:
         
         return len(splits)
 
-    def ingest_web_content(self, urls: List[str], metadata: Optional[dict] = None) -> int:
-        """Load and process web content"""
-        web_loader = WebBaseLoader(urls)
-        web_docs = web_loader.load()
-        return self.process_and_store_documents(web_docs, "news", metadata)
-
-    def ingest_emails(self, email_dir: str, metadata: Optional[dict] = None) -> int:
-        """Load and process emails from a directory"""
-        email_loader = DirectoryLoader(
-            email_dir,
-            glob="*.eml",
-            loader_cls=UnstructuredEmailLoader
-        )
-        email_docs = email_loader.load()
-        return self.process_and_store_documents(email_docs, "newsletter", metadata)
-
     def ingest_gmail(self, 
                     credentials_path: str = 'credentials.json',
                     query: str = "newer_than:7d",
                     max_results: int = 100,
                     metadata: Optional[dict] = None) -> int:
-        """Load and process emails from Gmail
+        """Load and process emails from Gmail using the Gmail API
         
         Args:
             credentials_path: Path to the Gmail API credentials file

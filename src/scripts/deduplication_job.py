@@ -85,13 +85,17 @@ class DeduplicationJob:
             # First run ingestion pipeline
             print("Starting document ingestion...")
             
-            # Example: Ingest from Gmail
-            email_chunks = self.pipeline.ingest_gmail(
-                credentials_path='credentials.json',
-                query="newer_than:7d",
-                max_results=100
-            )
-            print(f"Ingested {email_chunks} email chunks")
+            # Example: Ingest from Gmail using the Gmail API
+            try:
+                email_chunks = self.pipeline.ingest_gmail(
+                    credentials_path='credentials.json',
+                    query="newer_than:7d",
+                    max_results=100
+                )
+                print(f"Ingested {email_chunks} email chunks")
+            except Exception as e:
+                print(f"Error during Gmail ingestion: {str(e)}")
+                email_chunks = 0
             
             # Run deduplication
             print("Starting deduplication process...")
