@@ -3,3 +3,16 @@
 .streamlit/secrets.toml
 notebooks/token.json
 credentials.json
+credentials.json%
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Logs
+logs/
+*.log
