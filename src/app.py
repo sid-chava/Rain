@@ -14,41 +14,46 @@ from langgraph.graph import START, StateGraph
 from langchain import hub
 import requests
 import pandas as pd
+from fredapi import Fred
 
-# Tiingo API setup
-TIINGO_API_KEY = st.secrets["api_keys"].get("TIINGO_API_KEY")
-TIINGO_HEADERS = {
-    'Content-Type': 'application/json',
-    'Authorization': f'Token {TIINGO_API_KEY}'
-}
+# FRED API setup
+FRED_API_KEY = st.secrets["api_keys"].get("FRED_API_KEY")
+fred = Fred(api_key=FRED_API_KEY)
 
-def get_market_data(tickers=['SPY', 'VIX', 'TLT'], days=7):
-    """Fetch market data from Tiingo API"""
-    if not TIINGO_API_KEY:
-        st.warning("Tiingo API key not found in secrets. Please add it to continue.")
+def get_market_data(days=7):
+    """Fetch market data from FRED API"""
+    if not FRED_API_KEY:
+        st.warning("FRED API key not found in secrets. Please add it to continue.")
         return None
         
     end_date = datetime.now()
     start_date = end_date - timedelta(days=days)
     
+    # FRED Series IDs
+    series = {
+        'VIX': 'VIXCLS',  # VIX
+        '10Y': 'DGS10',   # 10-Year Treasury
+        '2Y': 'DGS2',     # 2-Year Treasury
+        '3M': 'DTB3',     # 3-Month Treasury
+    }
+    
     market_data = {}
-    for ticker in tickers:
+    for name, series_id in series.items():
         try:
-            url = f'https://api.tiingo.com/tiingo/daily/{ticker}/prices'
-            params = {
-                'startDate': start_date.strftime('%Y-%m-%d'),
-                'endDate': end_date.strftime('%Y-%m-%d'),
-            }
-            response = requests.get(url, headers=TIINGO_HEADERS, params=params)
-            response.raise_for_status()
-            data = response.json()
-            
-            if data:
-                market_data[ticker] = pd.DataFrame(data)
-                market_data[ticker]['date'] = pd.to_datetime(market_data[ticker]['date']).dt.date
+            data = fred.get_series(
+                series_id,
+                start_date=start_date,
+                end_date=end_date
+            )
+            if not data.empty:
+                df = pd.DataFrame(data, columns=['close'])
+                df.index.name = 'date'
+                df = df.reset_index()
+                df['date'] = pd.to_datetime(df['date']).dt.date
+                market_data[name] = df
                 
         except Exception as e:
-            st.error(f"Error fetching data for {ticker}: {str(e)}")
+            st.error(f"Error fetching data for {name}: {str(e)}")
             
     return market_data
 
@@ -87,7 +92,6 @@ First, list the dates of all newsletters you are analyzing in chronological orde
 Then proceed with your analysis, including:
 
 - Start with key market metrics and indicators:
-  * VIX, MOVE, and other volatility measures
   * Treasury yields and yield curve dynamics
   * Credit spreads and financial conditions
   * Currency movements and cross-asset correlations
@@ -211,7 +215,7 @@ def process_documents(docs):
     current_date = datetime.now().strftime("%Y-%m-%d")
     
     # Fetch market data
-    market_data = get_market_data(tickers=['SPY', 'VIX', 'TLT', 'DXY'], days=7)
+    market_data = get_market_data(days=7)
     
     # Prepare market data summary
     market_summary = []
