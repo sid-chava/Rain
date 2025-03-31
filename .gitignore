@@ -4,6 +4,7 @@
 notebooks/token.json
 credentials.json
 credentials.json%
+token.json
 
 # Python
 venv/
