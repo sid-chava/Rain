@@ -43,7 +43,7 @@ def get_market_data(days=7):
             data = fred.get_series(
                 series_id,
                 start_date=start_date,
-                end_date=end_date
+                end_date=start_date
             )
             if not data.empty:
                 df = pd.DataFrame(data, columns=['close'])
