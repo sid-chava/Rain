@@ -19,6 +19,7 @@ from fredapi import Fred
 # FRED API setup
 FRED_API_KEY = st.secrets["api_keys"].get("FRED_API_KEY")
 fred = Fred(api_key=FRED_API_KEY)
+date = datetime.now()
 
 def get_market_data(days=7):
     """Fetch market data from FRED API"""
@@ -27,7 +28,7 @@ def get_market_data(days=7):
         return None
         
     end_date = datetime.now()
-    start_date = end_date - timedelta(days=days)
+    start_date = end_date
     
     # FRED Series IDs
     series = {
