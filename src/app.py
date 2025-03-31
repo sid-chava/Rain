@@ -87,9 +87,14 @@ qa_prompt = hub.pull("rlm/rag-prompt")
 report_prompt = ChatPromptTemplate.from_messages([
     ("system", """You are an expert macro and volatility analyst with deep experience in global markets, monetary policy, and risk analysis. When analyzing markets and responding to queries:
 
-First, list the dates of all newsletters you are analyzing in chronological order at the very top of your response.
+First, display a "MARKET SNAPSHOT" section at the very top with:
+- Current VIX level and its daily change
+- Treasury yield levels (10Y, 2Y, 3M) and their daily changes
+- Key yield curve spreads (10Y-2Y, 10Y-3M)
 
-Then proceed with your analysis, including:
+Then list the dates of all newsletters you are analyzing in chronological order.
+
+After that, proceed with your analysis, including:
 
 - Start with key market metrics and indicators:
   * Treasury yields and yield curve dynamics
@@ -111,8 +116,7 @@ Then proceed with your analysis, including:
   * Specific risks to the current market narrative
   * Actionable trading implications
 
-
-Base your analysis on the provided context, but incorporate your broad market knowledge where relevant. Be specific rather than ambivalent - represent the views in the context. Maintain a professional, analytical tone and clearly distinguish between facts and opinions. Include the date at the top as well."""),
+Base your analysis on the provided context, but incorporate your broad market knowledge where relevant. Be specific rather than ambivalent - represent the views in the context. Maintain a professional, analytical tone and clearly distinguish between facts and opinions."""),
     ("human", "Generate a detailed market analysis with specific implications for our portfolio positions:\n\nContext: {context}")
 ])
 
@@ -220,17 +224,37 @@ def process_documents(docs):
     # Prepare market data summary
     market_summary = []
     if market_data:
-        for ticker, data in market_data.items():
-            if not data.empty:
-                latest = data.iloc[-1]
-                prev = data.iloc[-2] if len(data) > 1 else latest
-                pct_change = ((latest['close'] - prev['close']) / prev['close']) * 100
-                market_summary.append(f"{ticker}: ${latest['close']:.2f} ({pct_change:+.2f}%)")
+        # Format VIX data
+        if 'VIX' in market_data and not market_data['VIX'].empty:
+            vix_data = market_data['VIX']
+            latest_vix = vix_data.iloc[-1]['close']
+            prev_vix = vix_data.iloc[-2]['close'] if len(vix_data) > 1 else latest_vix
+            vix_change = latest_vix - prev_vix
+            market_summary.append(f"VIX: {latest_vix:.2f} ({vix_change:+.2f})")
+
+        # Format Treasury yields
+        yields = {}
+        for tenor in ['10Y', '2Y', '3M']:
+            if tenor in market_data and not market_data[tenor].empty:
+                yield_data = market_data[tenor]
+                latest_yield = yield_data.iloc[-1]['close']
+                prev_yield = yield_data.iloc[-2]['close'] if len(yield_data) > 1 else latest_yield
+                yield_change = latest_yield - prev_yield
+                yields[tenor] = latest_yield
+                market_summary.append(f"{tenor} Treasury: {latest_yield:.3f}% ({yield_change:+.3f})")
+        
+        # Calculate and add yield curve spreads
+        if '10Y' in yields and '2Y' in yields:
+            spread_10y2y = yields['10Y'] - yields['2Y']
+            market_summary.append(f"10Y-2Y Spread: {spread_10y2y:.3f}%")
+        if '10Y' in yields and '3M' in yields:
+            spread_10y3m = yields['10Y'] - yields['3M']
+            market_summary.append(f"10Y-3M Spread: {spread_10y3m:.3f}%")
     
     # Prepare context with market data
     context_with_dates = [
         f"Current Date: {current_date}\n\n"
-        f"Latest Market Data ({datetime.now().strftime('%Y-%m-%d %H:%M')} ET):\n"
+        f"MARKET SNAPSHOT ({datetime.now().strftime('%Y-%m-%d %H:%M')} ET):\n"
         + "\n".join(market_summary) + "\n\n"
         "Analysis based on the following sources:\n"
     ]
