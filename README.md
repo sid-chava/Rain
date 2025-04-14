@@ -1,5 +1,5 @@
 2/13/2025
-Can run the notebook (rag setup). Will need a supabase db, open ai key, and gmail key. 
+Can clone, but will need a supabase db, open ai key, and gmail key. 
 
 Currently my supabase db has a table called `messages` with the following columns:
 - id
