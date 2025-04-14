@@ -28,7 +28,7 @@ class DataIngestionPipeline:
         )
         
         # Initialize embeddings
-        self.embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
+        self.embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
         
         # Initialize vector store
         self.vector_store = SupabaseVectorStore(

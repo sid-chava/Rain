@@ -139,7 +139,7 @@ st.markdown("""
 This tool helps minimize time spent scrolling through daily newsletters by automatically extracting and analyzing key market insights. 
 The tool will become more comprehensive as more newsletters are indexed over the coming days.
 
-⚠️ **Note**: If you encounter an API error, please wait a few moments and try again. This is usually due to temporary rate limiting.
+⚠️ **Note**: Currently optimizing doc search to be more efficient. Will have this up soon again. Had to shut this one down in favor of a more lightweight version (will leave link here when ready). Apologies but feel free to check github for source code!.
 
 ---
 """)
