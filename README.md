@@ -7,8 +7,5 @@ Currently my supabase db has a table called `messages` with the following column
 - content
 - created_at
 
-right now I have loaded my gmail newsletters into the db. 
-
-The notebook currently outputs a nice macro outlook report but still working on structuring the output. 
-
-Rain will be the operations (multiple agents) to support me in managing my personal portfolio.
+had shut the live version of this down because supabase compute was getting expensive.
+Adapted a version of this script and set up for a VC client
