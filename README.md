@@ -8,4 +8,4 @@ Currently my supabase db has a table called `messages` with the following column
 - created_at
 
 had shut the live version of this down because supabase compute was getting expensive.
-Adapted a version of this script and set up for a VC client
+Adapted a version of this script and set up for a friend at a hedge fund
