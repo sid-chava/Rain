@@ -13,6 +13,7 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+rain-key.pem
 
 # Logs
 logs/
